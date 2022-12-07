@@ -26,10 +26,23 @@ enum Outcome {
     Win = 6,
 }
 
+impl FromStr for Outcome {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "X" => Ok(Self::Lose),
+            "Y" => Ok(Self::Draw),
+            "Z" => Ok(Self::Win),
+            _ => Err("Unknown outcome".to_string()),
+        }
+    }
+}
+
 fn main() {
     let data = fs::read_to_string("./input.txt").expect("Unable to read file");
     println!("Part 1: {}", solve_part_1(&data));
-    println!("Part 1: {}", solve_part_2(&data));
+    println!("Part 2: {}", solve_part_2(&data));
 }
 
 fn solve_part_1(data: &str) -> String {
@@ -80,7 +93,35 @@ fn solve_part_1(data: &str) -> String {
 }
 
 fn solve_part_2(data: &str) -> String {
-    todo!();
+    let result = data
+        .lines()
+        .map(|line| {
+            let moves = line.split(" ").collect::<Vec<_>>();
+            let elf_move = moves[0].parse::<Score>().unwrap();
+            let outcome = moves[1].parse::<Outcome>().unwrap();
+
+            use Outcome::*;
+            use Score::*;
+
+            let outcome_move = match outcome {
+                Lose => match elf_move {
+                    Rock => Scissors,
+                    Scissors => Paper,
+                    Paper => Rock,
+                },
+                Draw => elf_move,
+                Win => match elf_move {
+                    Rock => Paper,
+                    Scissors => Rock,
+                    Paper => Scissors,
+                },
+            };
+
+            outcome_move as i32 + outcome as i32
+        })
+        .sum::<i32>();
+
+    result.to_string()
 }
 
 #[cfg(test)]

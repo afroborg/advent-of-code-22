@@ -13,3 +13,22 @@ fn solve_part_1(data: &str) -> String {
 fn solve_part_2(data: &str) -> String {
     todo!();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_part_1() {
+        let data = "";
+
+        assert_eq!(solve_part_1(data), "");
+    }
+
+    #[test]
+    fn test_part_2() {
+        let data = "";
+
+        assert_eq!(solve_part_2(data), "");
+    }
+}

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::fs;
-use std::iter::Peekable;
 use std::str::Lines;
 
 fn main() {
@@ -9,11 +8,11 @@ fn main() {
     println!("Part 2: {}", solve_part_2(&data));
 }
 
-fn parse_commands(lines: &mut Peekable<Lines>) -> HashMap<String, u32> {
+fn parse_commands(lines: Lines) -> HashMap<String, u32> {
     let mut context: Vec<&str> = vec![];
     let mut directories: HashMap<String, u32> = HashMap::new();
 
-    for line in lines {
+    lines.for_each(|line| {
         let words = line.split_whitespace().collect::<Vec<_>>();
 
         match words[1] {
@@ -33,7 +32,7 @@ fn parse_commands(lines: &mut Peekable<Lines>) -> HashMap<String, u32> {
                 }
             }
             "ls" => {
-                continue;
+                return;
             }
             _ => {
                 // this is a file
@@ -46,14 +45,14 @@ fn parse_commands(lines: &mut Peekable<Lines>) -> HashMap<String, u32> {
                 }
             }
         }
-    }
+    });
 
     directories
 }
 
 fn solve_part_1(data: &str) -> String {
-    let mut lines = data.lines().peekable();
-    let directories = parse_commands(&mut lines);
+    let lines = data.lines();
+    let directories = parse_commands(lines);
 
     let result = directories.into_iter().fold(0, |mut acc, (_, value)| {
         acc += if value <= 100000 { value } else { 0 };
@@ -64,20 +63,20 @@ fn solve_part_1(data: &str) -> String {
 }
 
 fn solve_part_2(data: &str) -> String {
-    let mut lines = data.lines().peekable();
+    let lines = data.lines();
 
     let total_space = 70_000_000;
     let needed_space = 30_000_000;
     let max_usage = total_space - needed_space;
 
-    let directories = parse_commands(&mut lines);
+    let directories = parse_commands(lines);
     let root_size = directories.get("").unwrap();
 
     let need_to_free = root_size - max_usage;
 
     let dir_to_remove = directories
-        .values()
-        .filter(|value| value >= &&need_to_free)
+        .into_values()
+        .filter(|value| value >= &need_to_free)
         .min()
         .unwrap();
 

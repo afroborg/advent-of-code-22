@@ -1,8 +1,5 @@
 #![allow(unused_must_use)]
-use std::{
-    collections::{vec_deque, VecDeque},
-    fs,
-};
+use std::{collections::VecDeque, fs};
 
 type Stack = VecDeque<char>;
 
@@ -17,14 +14,15 @@ fn create_stacks(s: &str) -> Vec<Stack> {
     let nbr_of_stacks = lines.pop().unwrap().split("   ").count();
     let mut stacks: Vec<Stack> = vec![Stack::new(); nbr_of_stacks];
 
-    lines.iter().for_each(|line| {
+    lines.into_iter().for_each(|line| {
         let chars = line.chars().skip(1).step_by(4).collect::<Vec<_>>();
-        chars.iter().enumerate().for_each(|(i, c)| {
+
+        chars.into_iter().enumerate().for_each(|(i, c)| {
             if !c.is_alphabetic() {
                 return;
             }
 
-            stacks[i].push_back(*c);
+            stacks[i].push_back(c);
         });
     });
 
@@ -34,9 +32,11 @@ fn create_stacks(s: &str) -> Vec<Stack> {
 fn parse_step(step: &str) -> (usize, usize, usize) {
     let words = step.split(" ").collect::<Vec<_>>();
 
-    let nbr_of_moves = words[1].parse::<usize>().unwrap();
-    let from = words[3].parse::<usize>().unwrap();
-    let to = words[5].parse::<usize>().unwrap();
+    let parse = |s: &str| s.parse::<usize>().unwrap();
+
+    let nbr_of_moves = parse(words[1]);
+    let from = parse(words[3]);
+    let to = parse(words[5]);
 
     (nbr_of_moves, from, to)
 }
@@ -54,9 +54,9 @@ fn solve_part_1(data: &str) -> String {
         }
     });
 
-    let mut result = String::new();
-    stacks.iter().for_each(|stack| {
-        result.push(stack[0]);
+    let result = stacks.into_iter().fold("".to_string(), |mut acc, vec| {
+        acc.push(vec[0]);
+        acc
     });
 
     result.to_string()
@@ -76,9 +76,9 @@ fn solve_part_2(_data: &str) -> String {
             .collect();
     });
 
-    let mut result = String::new();
-    stacks.iter().for_each(|stack| {
-        result.push(stack[0]);
+    let result = stacks.into_iter().fold("".to_string(), |mut acc, vec| {
+        acc.push(vec[0]);
+        acc
     });
 
     result.to_string()

@@ -86,8 +86,8 @@ impl TreeMatrix {
 
         let bigger_than_above = || above.into_iter().all(|x| x < tree);
         let bigger_than_below = || below.into_iter().all(|x| x < tree);
-        let bigger_than_left = || left.into_iter().all(|x| x < &tree);
-        let bigger_than_right = || right.into_iter().all(|x| x < &tree);
+        let bigger_than_left = || left.into_iter().all(|x| x < tree);
+        let bigger_than_right = || right.into_iter().all(|x| x < tree);
 
         bigger_than_above() || bigger_than_below() || bigger_than_left() || bigger_than_right()
     }

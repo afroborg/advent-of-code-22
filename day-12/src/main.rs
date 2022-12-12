@@ -16,7 +16,8 @@ impl Elevation {
         match c {
             'S' => Self::Start,
             'E' => Self::End,
-            _ => Self::Value(c as i32 - 97),
+            'a'..='z' => Self::Value(c as i32 - 97),
+            _ => panic!("Invalid character"),
         }
     }
 }
@@ -29,7 +30,7 @@ impl Sub for Elevation {
 
     fn sub(self, other: Self) -> Self::Output {
         match (self, other) {
-            (Self::Value(a), Self::Value(b)) => a as i32 - b as i32,
+            (Self::Value(a), Self::Value(b)) => a - b,
             _ => panic!("Invalid subtraction"),
         }
     }
@@ -55,12 +56,13 @@ fn replace_start_end(grid: &mut Grid) -> (Location, Location) {
         for c in 0..grid[r].len() {
             let elevation = grid[r][c];
 
+            // replace start and end with values
             if elevation == Elevation::Start {
                 start = (r as i32, c as i32);
-                grid[r][c] = Elevation::Value(0);
+                grid[r][c] = Elevation::new('a');
             } else if elevation == Elevation::End {
                 end = (r as i32, c as i32);
-                grid[r][c] = Elevation::Value(25);
+                grid[r][c] = Elevation::new('z');
             }
         }
     }
@@ -80,7 +82,9 @@ where
     let nbr_of_columns = grid[0].len() as i32;
 
     while let Some((value, r, c)) = queue.pop_front() {
-        for (next_row, next_column) in [(r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)] {
+        let movements = [(r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)]; // Up, down, right, left
+
+        for (next_row, next_column) in movements {
             if next_row < 0
                 || next_row >= nbr_of_rows
                 || next_column >= nbr_of_columns
@@ -113,31 +117,28 @@ where
 
 fn solve_part_1(data: &str) -> String {
     let mut grid: Grid = parse_grid(data);
-
     let (start, end) = replace_start_end(&mut grid);
-    let result = loop_queue(
+
+    loop_queue(
         start,
         grid,
         |altitude| altitude > 1,
         |location| location == end,
-    );
-
-    result.to_string()
+    )
+    .to_string()
 }
 
 fn solve_part_2(data: &str) -> String {
     let mut grid: Grid = parse_grid(data);
-
     let (_, end) = replace_start_end(&mut grid);
 
-    let result = loop_queue(
+    loop_queue(
         end,
         grid.clone(),
         |altitude| altitude < -1,
         |(r, c)| grid[r as usize][c as usize] == Elevation::Value(0),
-    );
-
-    result.to_string()
+    )
+    .to_string()
 }
 
 #[cfg(test)]

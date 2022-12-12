@@ -134,7 +134,7 @@ fn solve_part_2(data: &str) -> String {
         end,
         grid.clone(),
         |altitude| altitude < -1,
-        |location| grid[location.0 as usize][location.1 as usize] == Elevation::Value(0),
+        |(r, c)| grid[r as usize][c as usize] == Elevation::Value(0),
     );
 
     result.to_string()

@@ -10,14 +10,14 @@ impl Elf {
         Self(start_stop[0]..=start_stop[1])
     }
 
-    fn fully_contains_another(&mut self, other: &mut Self) -> bool {
+    fn fully_contains_another(&self, other: &Self) -> bool {
         let s = &self.0;
         let o = &other.0;
 
         s.contains(o.start()) && s.contains(o.end()) || o.contains(s.start()) && o.contains(s.end())
     }
 
-    fn partial_contains_another(&mut self, other: &mut Self) -> bool {
+    fn partial_contains_another(&self, other: &Self) -> bool {
         let s = &self.0;
         let o = &other.0;
 
@@ -36,10 +36,10 @@ fn solve_part_1(data: &str) -> String {
         .lines()
         .filter(|line| {
             let (first, second) = line.split_once(',').unwrap();
-            let mut first = Elf::new(first);
-            let mut second = Elf::new(second);
+            let first = Elf::new(first);
+            let second = Elf::new(second);
 
-            first.fully_contains_another(&mut second)
+            first.fully_contains_another(&second)
         })
         .count();
 
@@ -51,10 +51,10 @@ fn solve_part_2(data: &str) -> String {
         .lines()
         .filter(|line| {
             let (first, second) = line.split_once(',').unwrap();
-            let mut first = Elf::new(first);
-            let mut second = Elf::new(second);
+            let first = Elf::new(first);
+            let second = Elf::new(second);
 
-            first.partial_contains_another(&mut second)
+            first.partial_contains_another(&second)
         })
         .count();
 

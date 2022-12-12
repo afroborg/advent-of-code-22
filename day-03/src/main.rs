@@ -90,7 +90,7 @@ fn solve_part_2(data: &str) -> String {
 
         let in_all_sacks = values
             .clone()
-            .filter(move |v| values.clone().filter(|v2| v == v2).count() == 3);
+            .filter(move |value| values.clone().filter(|v| v == value).count() == 3);
 
         in_all_sacks.max().unwrap_or_default()
     });

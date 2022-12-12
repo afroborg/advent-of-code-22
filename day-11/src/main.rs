@@ -2,10 +2,10 @@ use std::{collections::VecDeque, fs};
 
 #[derive(Debug, Clone)]
 struct Monkey {
-    items: VecDeque<usize>,
+    items: VecDeque<u64>,
     operation: Operation,
     test: Test,
-    touches: usize,
+    touches: u64,
 }
 
 impl Monkey {
@@ -15,39 +15,29 @@ impl Monkey {
         let items = lines
             .next()
             .unwrap()
-            .replace("Starting items: ", "")
+            .split(": ")
+            .last()
+            .unwrap()
             .split(", ")
             .map(|s| s.trim().parse().unwrap())
             .collect();
 
-        let operation = Operation::new(&lines.next().unwrap().replace("Operation: new = ", ""));
+        let operation = Operation::new(&lines.next().unwrap().split("= ").last().unwrap());
 
-        let divisible = lines
-            .next()
-            .unwrap()
-            .split_whitespace()
-            .last()
-            .unwrap()
-            .parse()
-            .unwrap();
+        let mut get_next_number = || -> u64 {
+            lines
+                .next()
+                .unwrap()
+                .split_whitespace()
+                .last()
+                .unwrap()
+                .parse()
+                .unwrap()
+        };
 
-        let value_one = lines
-            .next()
-            .unwrap()
-            .split_whitespace()
-            .last()
-            .unwrap()
-            .parse()
-            .unwrap();
-
-        let value_two = lines
-            .next()
-            .unwrap()
-            .split_whitespace()
-            .last()
-            .unwrap()
-            .parse()
-            .unwrap();
+        let divisible = get_next_number();
+        let value_one = get_next_number();
+        let value_two = get_next_number();
 
         Self {
             items,
@@ -61,17 +51,17 @@ impl Monkey {
         }
     }
 
-    fn inspect(&mut self, old: usize) -> usize {
+    fn inspect(&mut self, old: u64, common_denominator: u64) -> u64 {
         self.touches += 1;
-        self.operation.inspect(old)
+        self.operation.inspect(old, common_denominator)
     }
 }
 
 #[derive(Debug, Clone)]
 struct Test {
-    condition: usize,
-    if_true: usize,
-    if_false: usize,
+    condition: u64,
+    if_true: u64,
+    if_false: u64,
 }
 
 #[derive(Debug, Clone)]
@@ -110,7 +100,7 @@ impl Operation {
         }
     }
 
-    fn inspect(&self, old: usize) -> usize {
+    fn inspect(&self, old: u64, common_denominator: u64) -> u64 {
         let value_one = match self.value_one {
             Value::This => old,
             Value::Other(v) => v,
@@ -121,10 +111,12 @@ impl Operation {
             Value::Other(v) => v,
         };
 
-        match self.operation {
+        let result = match self.operation {
             OperationType::Add => value_one + value_two,
             OperationType::Multiply => value_one * value_two,
-        }
+        };
+
+        result % common_denominator
     }
 }
 
@@ -137,7 +129,7 @@ enum OperationType {
 #[derive(Debug, Clone)]
 enum Value {
     This,
-    Other(usize),
+    Other(u64),
 }
 
 fn main() {
@@ -146,16 +138,14 @@ fn main() {
     println!("Part 2: {}", solve_part_2(&data));
 }
 
-fn solve_part_1(data: &str) -> String {
-    let monkey_chunks = data.split("\n\n").map(|s| s.trim());
+fn process(monkeys: &mut Vec<Monkey>, rounds: u64, divisor: u64) -> Vec<u64> {
+    let common_denoniator = monkeys.iter().map(|m| m.test.condition).product();
 
-    let mut monkeys = monkey_chunks.map(Monkey::from_chunk).collect::<Vec<_>>();
-
-    for _ in 0..20 {
+    for _ in 0..rounds {
         for i in 0..monkeys.len() {
             while let Some(item) = monkeys[i].items.pop_front() {
-                let new_item = monkeys[i].inspect(item);
-                let new_item = new_item / 3;
+                let new_item = monkeys[i].inspect(item, common_denoniator);
+                let new_item = new_item / divisor;
 
                 let next_monkey = if new_item % monkeys[i].test.condition == 0 {
                     monkeys[i].test.if_true
@@ -163,7 +153,7 @@ fn solve_part_1(data: &str) -> String {
                     monkeys[i].test.if_false
                 };
 
-                monkeys[next_monkey].items.push_back(new_item);
+                monkeys[next_monkey as usize].items.push_back(new_item);
             }
         }
     }
@@ -171,22 +161,36 @@ fn solve_part_1(data: &str) -> String {
     let mut touches = monkeys.iter().map(|m| m.touches).collect::<Vec<_>>();
     touches.sort();
 
-    let result = touches.pop().unwrap() * touches.pop().unwrap();
+    touches
+}
+
+fn solve_part_1(data: &str) -> String {
+    let monkey_chunks = data.split("\n\n").map(|s| s.trim());
+
+    let mut monkeys = monkey_chunks.map(Monkey::from_chunk).collect::<Vec<_>>();
+    let touches = process(&mut monkeys, 20, 3);
+
+    let result: u64 = touches.iter().rev().take(2).product();
 
     result.to_string()
 }
 
 fn solve_part_2(data: &str) -> String {
-    todo!();
+    let monkey_chunks = data.split("\n\n").map(|s| s.trim());
+
+    let mut monkeys = monkey_chunks.map(Monkey::from_chunk).collect::<Vec<_>>();
+    let touches = process(&mut monkeys, 10_000, 1);
+
+    let result: u64 = touches.iter().rev().take(2).product();
+
+    result.to_string()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_part_1() {
-        let data = "Monkey 0:
+    const INPUT: &str = "Monkey 0:
 Starting items: 79, 98
 Operation: new = old * 19
 Test: divisible by 23
@@ -214,14 +218,13 @@ Test: divisible by 17
     If true: throw to monkey 0
     If false: throw to monkey 1";
 
-        assert_eq!(solve_part_1(data), "10605");
+    #[test]
+    fn test_part_1() {
+        assert_eq!(solve_part_1(INPUT), "10605");
     }
 
     #[test]
-    #[ignore]
     fn test_part_2() {
-        let data = "";
-
-        assert_eq!(solve_part_2(data), "");
+        assert_eq!(solve_part_2(INPUT), "2713310158");
     }
 }

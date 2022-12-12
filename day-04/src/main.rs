@@ -11,15 +11,17 @@ impl Elf {
     }
 
     fn fully_contains_another(&mut self, other: &mut Self) -> bool {
-        self.0.contains(&other.0.start()) && self.0.contains(&other.0.end())
-            || other.0.contains(&self.0.start()) && other.0.contains(&self.0.end())
+        let s = &self.0;
+        let o = &other.0;
+
+        s.contains(o.start()) && s.contains(o.end()) || o.contains(s.start()) && o.contains(s.end())
     }
 
     fn partial_contains_another(&mut self, other: &mut Self) -> bool {
-        self.0.contains(&other.0.start())
-            || self.0.contains(&other.0.end())
-            || other.0.contains(&self.0.start())
-            || other.0.contains(&self.0.end())
+        let s = &self.0;
+        let o = &other.0;
+
+        s.contains(o.start()) || s.contains(o.end()) || o.contains(s.start()) || o.contains(s.end())
     }
 }
 
@@ -33,13 +35,11 @@ fn solve_part_1(data: &str) -> String {
     let intersections = data
         .lines()
         .filter(|line| {
-            let parts = line.split(',').collect::<Vec<_>>();
-            let mut first = Elf::new(&parts[0]);
-            let mut second = Elf::new(&parts[1]);
+            let (first, second) = line.split_once(',').unwrap();
+            let mut first = Elf::new(first);
+            let mut second = Elf::new(second);
 
-            let intersects = first.fully_contains_another(&mut second);
-
-            intersects
+            first.fully_contains_another(&mut second)
         })
         .count();
 
@@ -50,13 +50,11 @@ fn solve_part_2(data: &str) -> String {
     let intersections = data
         .lines()
         .filter(|line| {
-            let parts = line.split(',').collect::<Vec<_>>();
-            let mut first = Elf::new(&parts[0]);
-            let mut second = Elf::new(&parts[1]);
+            let (first, second) = line.split_once(',').unwrap();
+            let mut first = Elf::new(first);
+            let mut second = Elf::new(second);
 
-            let intersects = first.partial_contains_another(&mut second);
-
-            intersects
+            first.partial_contains_another(&mut second)
         })
         .count();
 

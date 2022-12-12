@@ -42,10 +42,10 @@ fn parse_step(step: &str) -> (usize, usize, usize) {
 }
 
 fn solve_part_1(data: &str) -> String {
-    let split_data = data.split("\n\n").collect::<Vec<_>>();
-    let mut stacks = create_stacks(split_data[0]);
+    let (stacks, steps) = data.split_once("\n\n").unwrap();
+    let mut stacks = create_stacks(stacks);
 
-    let steps = split_data[1].lines().map(parse_step);
+    let steps = steps.lines().map(parse_step);
 
     steps.for_each(|(nbr_of_moves, from, to)| {
         for _ in 0..nbr_of_moves {

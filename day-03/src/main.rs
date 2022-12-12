@@ -10,6 +10,7 @@ impl Rucksack {
     fn new(s: &str) -> Self {
         let items = s.chars().collect::<Vec<_>>();
         let size = items.len() / 2;
+
         let compartment_one = items[0..size].to_vec();
         let compartment_two = items[size..].to_vec();
 
@@ -63,11 +64,7 @@ fn to_priority_values(rucksack: &Rucksack) -> Vec<i32> {
 }
 
 fn get_prioritized_value(rucksack: &Rucksack) -> i32 {
-    to_priority_values(rucksack)
-        .iter()
-        .max()
-        .unwrap()
-        .to_owned()
+    to_priority_values(rucksack).iter().max().unwrap().clone()
 }
 
 fn solve_part_1(data: &str) -> String {

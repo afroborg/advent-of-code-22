@@ -45,3 +45,33 @@ fn solve_part_2(lines: &str) -> String {
     carry.reverse();
     carry.iter().take(3).sum::<Calorie>().to_string()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: &str = "1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000";
+
+    #[test]
+    fn test_part_1() {
+        assert_eq!(solve_part_1(INPUT), "24000");
+    }
+
+    #[test]
+    fn test_part_2() {
+        assert_eq!(solve_part_2(INPUT), "45000");
+    }
+}

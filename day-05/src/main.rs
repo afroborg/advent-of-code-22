@@ -54,7 +54,7 @@ fn solve_part_1(data: &str) -> String {
         }
     });
 
-    let result = stacks.into_iter().fold("".to_string(), |mut acc, vec| {
+    let result = stacks.into_iter().fold(String::new(), |mut acc, vec| {
         acc.push(vec[0]);
         acc
     });
@@ -76,7 +76,7 @@ fn solve_part_2(_data: &str) -> String {
             .collect();
     });
 
-    let result = stacks.into_iter().fold("".to_string(), |mut acc, vec| {
+    let result = stacks.into_iter().fold(String::new(), |mut acc, vec| {
         acc.push(vec[0]);
         acc
     });

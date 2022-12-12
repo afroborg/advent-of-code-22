@@ -86,7 +86,7 @@ fn solve_part_2(data: &str) -> String {
     let instructions = parse_instructions(data);
     let cycles = cycle(instructions, false);
 
-    let mut str = "".to_string();
+    let mut str = String::new();
 
     for i in (0..cycles.len()).step_by(40) {
         if i != 0 {

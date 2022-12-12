@@ -126,15 +126,19 @@ fn solve_part_2(data: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::solve_part_1;
+    use crate::*;
 
-    #[test]
-    fn it_works() {
-        let data = "A Y
+    const INPUT: &str = "A Y
 B X
 C Z
 ";
+    #[test]
+    fn test_part_1() {
+        assert_eq!(solve_part_1(INPUT), "15")
+    }
 
-        assert_eq!(solve_part_1(data), "15")
+    #[test]
+    fn test_part_2() {
+        assert_eq!(solve_part_2(INPUT), "12")
     }
 }

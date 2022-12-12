@@ -58,8 +58,8 @@ fn map_to_value(c: &char) -> i32 {
 fn to_priority_values(rucksack: &Rucksack) -> Vec<i32> {
     rucksack
         .shared_items()
-        .iter()
-        .map(|c| map_to_value(*c))
+        .into_iter()
+        .map(|c| map_to_value(c))
         .collect()
 }
 
